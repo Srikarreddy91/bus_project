@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
-<title>Passenger Bus View</title>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
-
+  <title>Passenger Bus View</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css"/>
 </head>
-
 <body>
+  <h2>Passenger Dashboard</h2>
+  <div class="metrics">
+    <div>Passengers: <strong id="count">0</strong></div>
+    <div>Seat Availability: <strong id="seats">0</strong></div>
+    <div>Occupancy: <strong id="occupancy">0%</strong></div>
+  </div>
 
-<h2>Passenger Count</h2>
-<h1 id="count">0</h1>
+  <div id="etaCard">
+    <h3>Bus Stops + ETA</h3>
+    <ul id="etaList"></ul>
+  </div>
 
-<div id="map" style="height:600px"></div>
+  <div id="map"></div>
 
-<script src="/static/map.js"></script>
-
+  <script src="/static/map.js"></script>
 </body>
 </html>
