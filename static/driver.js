@@ -3,6 +3,7 @@ var map = L.map('map').setView([17.385, 78.486], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
 var socket = io();
+var LIVE_SYNC_INTERVAL_MS = 4000;
 
 var startMarker = L.circleMarker([17.385, 78.486], { color: 'blue', radius: 8 }).addTo(map);
 var destMarker = null;
@@ -10,7 +11,7 @@ var routeLine = L.polyline([], { color: 'red' }).addTo(map);
 var stopMarkers = [];
 var stops = [];
 
-fetch('/state').then(r => r.json()).then(initFromState);
+fetch('/state').then(function (r) { return r.json(); }).then(initFromState);
 
 function initFromState(data) {
   if (data.bus_location) {
@@ -64,7 +65,6 @@ function syncLocation(isManual) {
     map.setView([lat, lon], 15);
 
     postGps(lat, lon, pos.coords.speed);
-
     setGpsStatus(isManual ? 'manual sync complete' : 'live sync');
   }, function (err) {
     var reason = (err && err.message) ? err.message : 'location unavailable';
@@ -75,8 +75,8 @@ function syncLocation(isManual) {
 function searchStart() {
   var query = document.getElementById('startSearch').value;
   fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query))
-    .then(res => res.json())
-    .then(data => {
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
       if (!data.length) return;
       var lat = parseFloat(data[0].lat);
       var lon = parseFloat(data[0].lon);
@@ -93,8 +93,8 @@ function setDestinationMarker(lat, lon) {
 function searchDestination() {
   var query = document.getElementById('destSearch').value;
   fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query))
-    .then(res => res.json())
-    .then(data => {
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
       if (!data.length) return;
       var lat = parseFloat(data[0].lat);
       var lon = parseFloat(data[0].lon);
@@ -126,8 +126,8 @@ function recalculateRoute() {
 
 function renderStops(newStops) {
   stops = newStops;
-  stopMarkers.forEach(m => map.removeLayer(m));
-  stopMarkers = stops.map((s, idx) => {
+  stopMarkers.forEach(function (m) { map.removeLayer(m); });
+  stopMarkers = stops.map(function (s, idx) {
     return L.marker([s.lat, s.lon]).addTo(map).bindPopup((s.name || 'Stop') + ' #' + (idx + 1));
   });
 }
@@ -154,5 +154,5 @@ map.on('click', function (e) {
 socket.on('route_update', function (data) { routeLine.setLatLngs(data || []); });
 socket.on('stops_update', function (data) { renderStops(data || []); });
 
-setInterval(function () { syncLocation(false); }, 4000);
+setInterval(function () { syncLocation(false); }, LIVE_SYNC_INTERVAL_MS);
 syncLocation(false);
